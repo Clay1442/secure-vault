@@ -3,16 +3,9 @@ package com.securevault.secure_vault_api.entities;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+
+import com.securevault.secure_vault_api.security.CryptoConverter;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "note_tb")
@@ -29,13 +22,14 @@ public class Note implements Serializable{
 	private String username;
     
 	@Column(nullable = false)
+    @Convert(converter = CryptoConverter.class)
 	private String password;
 	
 	private LocalDateTime createdAt;
 	
 	private LocalDateTime updateAt;
     
-	@Lob 
+	@Column(columnDefinition = "TEXT")
 	private String description;
 		
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -50,7 +44,6 @@ public class Note implements Serializable{
 			String password, String username) {
 		super();
 		this.id = id;
-		
 		this.title = title;
 		this.user = user;
 		this.createdAt = createdAt;
@@ -79,18 +72,24 @@ public class Note implements Serializable{
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-	public LocalDateTime getUpdateAt() {
-		return updateAt;
-	}
-	public void setUpdateAt(LocalDateTime updateAt) {
-		this.updateAt = updateAt;
-	}
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
 	public String getDescription() {
 		return description;
 	}
