@@ -16,13 +16,11 @@ public class UserDTO {
 
     private String email;
 
-    private Set<NoteDTO> notes = new HashSet<>();
 
     public UserDTO(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
-        this.notes = user.getNotes().stream().map(NoteDTO::new).collect(Collectors.toSet());
     }
 
     public Long getId() {
@@ -43,13 +41,6 @@ public class UserDTO {
 
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public Set<NoteDTO> getNotes() {
-        return notes;
     }
 
 }

@@ -4,7 +4,6 @@ import com.securevault.secure_vault_api.dto.UserCreateDTO;
 import com.securevault.secure_vault_api.dto.UserDTO;
 import com.securevault.secure_vault_api.services.UserService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
+
 
 @RestController
 @RequestMapping(value = "/users")
@@ -28,8 +27,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Set<UserDTO>> getAll(){
-        Set<UserDTO> users = userService.findAll();
+    public ResponseEntity<List<UserDTO>> getAll(){
+        List<UserDTO> users = userService.findAll();
         return ResponseEntity.ok().body(users);
     }
 

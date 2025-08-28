@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.time.LocalDateTime;
 
 import static com.securevault.secure_vault_api.entities.enums.Role.ROLE_ADMIN;
+import static com.securevault.secure_vault_api.entities.enums.Role.ROLE_CLIENT;
 
 
 @Configuration
@@ -33,7 +34,7 @@ public class TestConfig implements CommandLineRunner{
         User user = new User(null, "clay", "clay@email.com", passwordEncoder.encode("123456"));
         User user2 = new User(null, "Lara", "lara@email.com", passwordEncoder.encode("123456"));
         user.roleAdd(ROLE_ADMIN);
-        user2.roleAdd(ROLE_ADMIN);
+        user2.roleAdd(ROLE_CLIENT);
 
         Note note  = new Note(null, "SteamPassword", user, LocalDateTime.now(), LocalDateTime.now(), "senha da conta steam", "123456987", "clay");
         Note note2  = new Note(null, "InstagramPassword", user2, LocalDateTime.now(), LocalDateTime.now(), "senha da conta do instagram", "123456987", "Lara");

@@ -105,6 +105,8 @@ public class NoteService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Note not found with id: " + id + " for user: " + user.getId()
                 ));
+
+        System.out.println("Note with ID " + id + " deleted successfully.");
         noteRepository.delete(note);
     }
 

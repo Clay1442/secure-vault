@@ -87,6 +87,9 @@ public class User implements Serializable, UserDetails {
 		this.active = active;
 	}
 
+    public Set<Role> getRoles() {
+        return roles;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
