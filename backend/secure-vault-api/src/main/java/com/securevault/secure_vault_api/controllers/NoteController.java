@@ -1,17 +1,18 @@
 package com.securevault.secure_vault_api.controllers;
 
+import com.securevault.secure_vault_api.dto.NoteCreateDTO;
 import com.securevault.secure_vault_api.dto.NoteDTO;
 import com.securevault.secure_vault_api.services.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/note")
+@RequestMapping("/notes")
 public class NoteController {
 
     @Autowired
@@ -22,5 +23,25 @@ public class NoteController {
        List<NoteDTO> notes =  noteService.findAll();
        return ResponseEntity.ok().body(notes);
     }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<NoteDTO> findById(@PathVariable long id){
+        NoteDTO notes =  noteService.findById(id);
+        return ResponseEntity.ok().body(notes);
+    }
+
+    @PostMapping
+    public ResponseEntity<NoteDTO> create(@RequestBody NoteCreateDTO dto){
+        NoteDTO newNote = noteService.create(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newNote.getId()).toUri();
+        return ResponseEntity.created(uri).body(newNote);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id){
+        noteService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

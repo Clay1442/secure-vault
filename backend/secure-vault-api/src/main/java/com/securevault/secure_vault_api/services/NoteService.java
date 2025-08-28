@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,27 +27,37 @@ public class NoteService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    public NoteDTO findById(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
 
-    protected Note findByEntity(Long id){
-         return noteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id));
-    }
+        User user = userRepository.findByEmail(currentPrincipalName)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
-    public NoteDTO findById(Long id){
-        Note note = findByEntity(id);
+        Note note = noteRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id + " and userId: " + user.getId()));
         return new NoteDTO(note);
     }
 
-    public List<NoteDTO> findAll(){
-        List<Note> notes = noteRepository.findAll();
-        List<NoteDTO> dtos = notes.stream().map(NoteDTO::new).collect(Collectors.toList());
-        return dtos;
+    public List<NoteDTO> findAll() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        User user = userRepository.findByEmail(currentPrincipalName)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentPrincipalName));
+
+       List<Note> notes =  noteRepository.findAllByUserId(user.getId());
+       return notes.stream().map(NoteDTO::new).collect(Collectors.toList());
     }
 
 
-    public NoteDTO create(NoteCreateDTO dto, long id){
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    public NoteDTO create(NoteCreateDTO dto){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+
+        User user = userRepository.findByEmail(currentPrincipalName)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found with email: " + currentPrincipalName));
+
         Note note = new Note();
         note.setTitle(dto.getTitle());
         note.setDescription(dto.getDescription());
@@ -61,11 +70,15 @@ public class NoteService {
         return new NoteDTO(savedNote);
     }
 
-    public NoteDTO update(NoteUpdateDTO dto, long id){
+    public NoteDTO update(NoteUpdateDTO dto, long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
-        Note note = findByEntity(id);
+        User user = userRepository.findByEmail(currentPrincipalName)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentPrincipalName));
+
+        Note note = noteRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + id + " and userId: " + user.getId()));
 
         if(!note.getUser().getEmail().equals(currentPrincipalName)){
             throw new AccessDeniedException("You do not have permission to modify this note.");
@@ -81,9 +94,18 @@ public class NoteService {
     }
 
 
-    public void delete(Long id){
-        Note note = findByEntity(id);
-        noteRepository.deleteById(note.getId());
+    public void delete(Long id) {
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       String currentPrincipalName = authentication.getName();
+
+        User user = userRepository.findByEmail(currentPrincipalName)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentPrincipalName));
+
+        Note note = noteRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Note not found with id: " + id + " for user: " + user.getId()
+                ));
+        noteRepository.delete(note);
     }
 
 
