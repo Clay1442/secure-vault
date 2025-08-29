@@ -2,6 +2,7 @@ package com.securevault.secure_vault_api.controllers;
 
 import com.securevault.secure_vault_api.dto.UserCreateDTO;
 import com.securevault.secure_vault_api.dto.UserDTO;
+import com.securevault.secure_vault_api.dto.UserUpdateDTO;
 import com.securevault.secure_vault_api.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,12 @@ public class UserController {
         UserDTO user =  userService.create(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
         return ResponseEntity.created(uri).body(user);
+    }
+
+    @PutMapping
+    public ResponseEntity<UserDTO> update(@Valid @RequestBody UserUpdateDTO dto) {
+        UserDTO user = userService.update(dto);
+        return ResponseEntity.ok(user);
     }
 
     @DeleteMapping("/{id}")
