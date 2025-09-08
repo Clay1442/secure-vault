@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notes")
+@RequestMapping(value ="/notes")
 public class NoteController {
 
     @Autowired

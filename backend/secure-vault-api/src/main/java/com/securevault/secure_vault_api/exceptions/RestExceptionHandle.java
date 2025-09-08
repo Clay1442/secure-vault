@@ -24,7 +24,7 @@ public class RestExceptionHandle {
         error.setPath(request.getRequestURI());
         error.setMessage("Resource Not Found");
 
-        System.err.println("ERRO INESPERADO: " + ex.getMessage());
+        System.err.println("UNEXPECTED ERROR:  " + ex.getMessage());
         return ResponseEntity.status(status).body(error);
 
     }
@@ -40,7 +40,7 @@ public class RestExceptionHandle {
         error.setPath(request.getRequestURI());
         error.setMessage("Object Already Exists");
 
-        System.err.println("ERRO INESPERADO: " + ex.getMessage());
+        System.err.println("UNEXPECTED ERROR:  " + ex.getMessage());
         return ResponseEntity.status(status).body(error);
 
     }
@@ -56,7 +56,7 @@ public class RestExceptionHandle {
         error.setPath(request.getRequestURI());
         error.setMessage("You are not allowed to access this resource.");
 
-        System.err.println("ERRO INESPERADO: " + ex.getMessage());
+        System.err.println("UNEXPECTED ERROR:  " + ex.getMessage());
         return ResponseEntity.status(status).body(error);
 
     }
@@ -71,8 +71,7 @@ public class RestExceptionHandle {
         error.setMessage(ex.getMessage());
         error.setPath(request.getRequestURI());
         error.setMessage("Internal Server Error");
-
-        System.err.println("ERRO INESPERADO: " + ex.getMessage());
+        System.err.println("UNEXPECTED ERROR: " + ex.getMessage());
         return ResponseEntity.status(status).body(error);
     }
 
