@@ -35,7 +35,7 @@ public class AdminNoteService {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<NoteMetadataDTO> findAllByUserId(Long id) {
+    public List<NoteMetadataDTO> findNotesByUserId(Long id) {
         return noteRepository.findAllByUserId(id)
                 .stream()
                 .map(NoteMetadataDTO::new)
