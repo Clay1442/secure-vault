@@ -8,12 +8,12 @@ import com.securevault.secure_vault_api.entities.enums.Role;
 import com.securevault.secure_vault_api.exceptions.ExistingObject;
 import com.securevault.secure_vault_api.exceptions.ResourceNotFoundException;
 import com.securevault.secure_vault_api.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +22,13 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
+   private final UserRepository userRepository;
+   private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+   public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+       this.userRepository = userRepository;
+       this.passwordEncoder = passwordEncoder;
+   }
 
     protected User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -37,39 +39,38 @@ public class UserService {
 
     }
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> findAll() {
-        User user = getAuthenticatedUser();
-        if(user.getRoles().contains(Role.ROLE_ADMIN)){
             List<User> users = userRepository.findAll();
             List<UserDTO> userDTOs = users.stream().map(UserDTO::new).collect(Collectors.toList());
             return userDTOs;
-        }else {
-            throw new AccessDeniedException("You are not allowed to access this resource.");
-        }
     }
 
     //Returns if user is Admin or if user is equal to authenticated user
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isOwner(authentication, #id)")
     public UserDTO findById(Long id) {
-        User authUser = getAuthenticatedUser();
-        if (authUser.getRoles().contains(Role.ROLE_ADMIN) || authUser.getId().equals(id)) {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-            return new UserDTO(user);
-        } else {
-            throw new AccessDeniedException("You do not have permission to access this user's data.");
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        return new UserDTO(user);
     }
-
 
     public UserDTO create(UserCreateDTO dto) {
         User user = new User();
         user.setName(dto.getName());
+        if(userRepository.findByEmail(dto.getEmail()).isPresent()){
+            throw new ExistingObject("User with this email already exists");
+        }
         user.setEmail(dto.getEmail());
+
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.roleAdd(Role.ROLE_CLIENT);
 
         return new UserDTO(userRepository.save(user));
     }
 
+    @Transactional
     public UserDTO update(UserUpdateDTO dto) {
         User user = getAuthenticatedUser();
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
@@ -96,17 +97,13 @@ public class UserService {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isOwner(authentication, #id)")
     public void delete(Long id) {
-        User authUser = getAuthenticatedUser();
-        if (authUser.getRoles().contains(Role.ROLE_ADMIN) || authUser.getId().equals(id)) {
             User userToDelete = userRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
             userRepository.delete(userToDelete);
-
             System.out.println("User with ID " + id + " deleted successfully.");
-        }else {
-            throw new AccessDeniedException("You do not have permission to access this user's data.");
-        }
+
     }
 
 }
