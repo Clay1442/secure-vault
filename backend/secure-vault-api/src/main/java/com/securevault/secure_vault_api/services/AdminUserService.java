@@ -19,7 +19,7 @@ public class AdminUserService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserDTO updateUserRole(UpdateRoleDTO dto, Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + ", not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.roleAdd(dto.getRoles());
         User savedUser = userRepository.save(user);
         return new UserDTO(savedUser);

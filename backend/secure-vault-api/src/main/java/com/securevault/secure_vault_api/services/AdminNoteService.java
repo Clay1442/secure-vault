@@ -21,7 +21,7 @@ public class AdminNoteService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public NoteMetadataDTO findById(Long id) {
-        Note note = noteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Note note found"));
+        Note note = noteRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Note not found"));
         return new NoteMetadataDTO(note);
     }
 

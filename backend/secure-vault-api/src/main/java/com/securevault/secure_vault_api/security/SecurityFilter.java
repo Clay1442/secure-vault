@@ -36,7 +36,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             if (!email.isEmpty()) {
                 UserDetails user = userRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado no filtro de segurança"));
+                        .orElseThrow(() -> new RuntimeException("User not found in security filter"));
 
 
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

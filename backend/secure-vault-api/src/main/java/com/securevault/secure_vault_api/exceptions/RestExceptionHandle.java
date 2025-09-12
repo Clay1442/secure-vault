@@ -75,4 +75,16 @@ public class RestExceptionHandle {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(ErrorEmailSubmitException.class)
+    public ResponseEntity<StandardError> handleException(ErrorEmailSubmitException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError error = new StandardError();
+        error.setTimestamp(Instant.now());
+        error.setStatus(status.value());
+        error.setMessage(ex.getMessage());
+        error.setPath(request.getRequestURI());
+        error.setMessage("Internal Server Error");
+        return ResponseEntity.status(status).body(error);
+    }
+
 }

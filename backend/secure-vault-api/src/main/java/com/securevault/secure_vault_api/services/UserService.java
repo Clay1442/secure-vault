@@ -43,8 +43,7 @@ public class UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> findAll() {
             List<User> users = userRepository.findAll();
-            List<UserDTO> userDTOs = users.stream().map(UserDTO::new).collect(Collectors.toList());
-            return userDTOs;
+            return users.stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
     //Returns if user is Admin or if user is equal to authenticated user
