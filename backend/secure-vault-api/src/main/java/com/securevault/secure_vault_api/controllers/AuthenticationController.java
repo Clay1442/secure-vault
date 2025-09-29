@@ -12,11 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@CrossOrigin
 @RequestMapping(value ="/auth")
 public class AuthenticationController {
 
@@ -33,7 +35,6 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
-
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
         var user = (User) auth.getPrincipal();

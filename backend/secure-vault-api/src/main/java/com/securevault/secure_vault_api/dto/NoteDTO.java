@@ -1,5 +1,6 @@
 package com.securevault.secure_vault_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.securevault.secure_vault_api.entities.Note;
 import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
@@ -16,8 +17,10 @@ public class NoteDTO{
 
     private String password;
 
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime updateAt;
 
     private String description;

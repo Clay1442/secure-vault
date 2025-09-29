@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +39,8 @@ public class SecurityConfig{
     public DefaultSecurityFilterChain  securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(Customizer.withDefaults()).authorizeHttpRequests(auth -> auth
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/forgot-password").permitAll()
@@ -47,13 +50,17 @@ public class SecurityConfig{
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)).build();
     }
 
-
-    @Bean
+ @Bean
  public CorsConfigurationSource corsConfigurationSource() {
 
  CorsConfiguration corsConfiguration = new CorsConfiguration();
- corsConfiguration.addAllowedOrigin("http://localhost:8080/h2-console/**");
 
+ corsConfiguration.addAllowedOrigin("http://localhost:8080/h2-console/**");
+ corsConfiguration.addAllowedOrigin(("http://localhost:3000"));
+
+corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+ corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
  source.registerCorsConfiguration("/**", corsConfiguration);
  return source;
